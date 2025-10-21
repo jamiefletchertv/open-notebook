@@ -1,4 +1,5 @@
 import apiClient from './client'
+import { getApiUrl } from '@/lib/config'
 import { SearchRequest, SearchResponse, AskRequest } from '@/lib/types/search'
 
 export const searchApi = {
@@ -8,7 +9,7 @@ export const searchApi = {
     return response.data
   },
 
-  // Ask with streaming (uses relative URL for Docker compatibility)
+  // Ask with streaming
   askKnowledgeBase: async (params: AskRequest) => {
     // Get auth token using the same logic as apiClient interceptor
     let token = null
@@ -26,9 +27,9 @@ export const searchApi = {
       }
     }
 
-    // Use relative URL to leverage Next.js rewrites
-    // This works both in dev (Next.js proxy) and production (Docker network)
-    const url = '/api/search/ask'
+    // Get the full API URL (e.g., http://localhost:5055)
+    const apiUrl = await getApiUrl()
+    const url = `${apiUrl}/api/search/ask`
 
     // Use fetch with ReadableStream for SSE
     const response = await fetch(url, {
